@@ -1,0 +1,40 @@
+.navbarWrapper {
+  border-bottom: 1px solid #dbdbdb;
+  height: 54px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #fff;
+  z-index: 10;
+}
+
+.navbarInnerWrapper {
+  height: 100%;
+  padding: 0 20px;
+}
+
+.navbar {
+  max-width: 935px;
+  margin: auto;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  margin-top: 7px;
+}
+
+.menuWrapper {
+  display: flex;
+}
+
+.menuIcon {
+  font-size: 22px;
+  margin: 0 0.8rem;
+}
+
+.menuIcon:last-child {
+  margin-right: 0;
+}

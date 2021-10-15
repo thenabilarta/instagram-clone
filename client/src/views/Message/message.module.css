@@ -1,0 +1,17 @@
+.messageWrapper {
+  min-height: calc(100vh - 114px);
+  display: flex;
+  flex-direction: row;
+  border-radius: 3px;
+  border: 1px solid #dbdbdb;
+}
+
+.leftWrapper {
+  height: 600px;
+  flex: 1;
+}
+
+.rightWrapper {
+  flex: 1;
+  height: 600px;
+}

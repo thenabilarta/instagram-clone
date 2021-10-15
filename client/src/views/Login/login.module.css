@@ -1,0 +1,42 @@
+.loginWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: row;
+}
+
+.bannerWrapper {
+  width: 454px;
+}
+
+.bannerWrapper img {
+  width: 100%;
+}
+
+.loginBoxWrapper {
+  width: 350px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.loginBox {
+  border-radius: 3px;
+  border: 1px solid #dbdbdb;
+  height: 500px;
+  width: 100%;
+  background-color: white;
+}
+
+.loginBoxHeader {
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
+}
+
+.loginBox img {
+  height: 100%;
+}

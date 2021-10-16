@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 import { Form, Input, Button, Row, Alert } from "antd";
 import { useDispatch } from "react-redux";
-import axios from "axios";
 import loginBanner from "../../assets/instagramloginbanner.png";
 import logo from "../../assets/loginlogo.png";
-import styles from "./login.module.css";
+import styles from "./register.module.css";
 
 const Login = () => {
   const [isError, setIsError] = useState(false);
@@ -16,15 +16,14 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const onSubmit = (values) => {
-    console.log(values);
-
     let dataToSubmit = {
       username: values.username,
+      email: values.email,
       password: values.password,
     };
 
     axios
-      .post("http://localhost:5000/api/users/login", dataToSubmit)
+      .post("http://localhost:5000/api/users/register", dataToSubmit)
       .then((res) => {
         console.log(res.data);
       });
@@ -41,22 +40,6 @@ const Login = () => {
     // });
   };
 
-  const imageList = [
-    "https://www.instagram.com/static/images/homepage/screenshot1.jpg/d6bf0c928b5a.jpg",
-    "https://www.instagram.com/static/images/homepage/screenshot5.jpg/0a2d3016f375.jpg",
-    "https://www.instagram.com/static/images/homepage/screenshot4.jpg/842fe5699220.jpg",
-    "https://www.instagram.com/static/images/homepage/screenshot3.jpg/f0c687aa6ec2.jpg",
-    "https://www.instagram.com/static/images/homepage/screenshot2.jpg/6f03eb85463c.jpg",
-  ];
-
-  setTimeout(() => {
-    if (imageListCounter === imageList.length - 1) {
-      setImageListCounter(0);
-    } else {
-      setImageListCounter(imageListCounter + 1);
-    }
-  }, 5000);
-
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
@@ -66,12 +49,6 @@ const Login = () => {
   };
   return (
     <div className={styles.loginWrapper}>
-      <div className={styles.bannerWrapper}>
-        <img className={styles.outerBanner} src={loginBanner} alt="" />
-        <div className={styles.innerBanner}>
-          <img src={imageList[imageListCounter]} alt="" />
-        </div>
-      </div>
       <div className={styles.loginBoxWrapper}>
         <div className={styles.loginBox}>
           <div className={styles.loginBoxHeader}>
@@ -108,6 +85,25 @@ const Login = () => {
                   />
                 </Form.Item>
                 <Form.Item
+                  name="email"
+                  rules={[
+                    {
+                      type: "email",
+                      message: "Please input a valid E-mail!",
+                    },
+                    {
+                      required: true,
+                      message: "Please input your email!",
+                    },
+                  ]}
+                >
+                  <Input
+                    size="large"
+                    placeholder="Email"
+                    style={{ height: 36 }}
+                  />
+                </Form.Item>
+                <Form.Item
                   name="password"
                   rules={[
                     { required: true, message: "Please input your password!" },
@@ -131,29 +127,20 @@ const Login = () => {
                   </Row>
                 </Form.Item>
               </Form>
-              <Row>
-                <Button
-                  style={{ padding: 0, fontSize: 12, margin: "auto" }}
-                  type="link"
-                  onClick={handleForgotPassword}
-                >
-                  Forgot your password?
-                </Button>
-              </Row>
             </div>
           </div>
         </div>
         <div className={styles.registerBox}>
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <strong
             style={{
               cursor: "pointer",
             }}
             onClick={() => {
-              history.push("/register");
+              history.push("/login");
             }}
           >
-            Sign up
+            Login
           </strong>
         </div>
       </div>

@@ -6,9 +6,9 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
+app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 
 app.use("/api/users", require("./routes/users"));
@@ -67,6 +67,6 @@ app.get("/api/user", (req, res) => {
   });
 });
 
-app.listen(8080, () => {
+app.listen(5000, () => {
   console.log("listening");
 });

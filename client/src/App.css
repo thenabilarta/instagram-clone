@@ -17,3 +17,8 @@
   position: relative;
   padding-top: 84px;
 }
+
+/* login form */
+div[role="alert"] {
+  font-size: 11px;
+}

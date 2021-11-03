@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { Row, Button } from "antd";
 import axios from "axios";
 import { MessageOutlined, SendOutlined } from "@ant-design/icons";
@@ -21,44 +21,7 @@ function Message() {
     fetchUser();
     socket.connect();
     socket.on("private message", (res) => {
-      const msgData = [];
-      let dayData = [];
-      let currentDay;
-      res.forEach((r, index) => {
-        console.log("a", moment(r.date, "DD-MM-YYYYTHH-mm-ss"));
-        console.log("b", moment(r.date, currentDay));
-        console.log(
-          "c",
-          moment(r.date, "DD-MM-YYYYTHH-mm-ss").isSame(currentDay, "year")
-        );
-        if (index === 0) {
-          console.log("index0");
-          currentDay = moment(r.date, "DD-MM-YYYYTHH-mm-ss").format(
-            "DD-MM-YYYY"
-          );
-
-          dayData.push(r);
-        } else {
-          console.log(index);
-          const curdate = moment(r.date, "DD-MM-YYYYTHH-mm-ss").format(
-            "DD-MM-YYYY"
-          );
-          if (moment(curdate).isSame(currentDay, "day")) {
-            console.log("SAME DAY");
-            dayData.push(r);
-          } else {
-            currentDay = moment(r.date, "DD-MM-YYYYTHH-mm-ss").format(
-              "DD-MM-YYYY"
-            );
-            msgData.push(dayData);
-            dayData = [];
-            dayData.push(r);
-          }
-        }
-      });
-      console.log("msgData", msgData);
-      setMessageList(msgData);
-      // setMessageList(res);
+      setMessageList(res);
     });
   }, []);
 
@@ -85,97 +48,6 @@ function Message() {
         console.log(res.data);
         setUserList(res.data);
       });
-  };
-
-  const renderChatBox = () => {
-    return (
-      <>
-        {messageList.map((m, index) => {
-          return m.map((d, index2) => {
-            if (
-              d._to === auth.id.toString() &&
-              d._from === chosedChat.toString()
-            ) {
-              return (
-                <Fragment key={index2}>
-                  {index2 === 0 && (
-                    <div className={styles.date}>
-                      {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format("LLL")}
-                    </div>
-                  )}
-                  <div className={styles.chat} key={index}>
-                    <div className={styles.profileImageWrapper}>
-                      <img
-                        src={getUserProfileImage(parseInt(d._from))}
-                        alt=""
-                        className={styles.profileImage}
-                      />
-                    </div>
-                    <div className={styles.text}>{d.content}</div>
-                  </div>
-                </Fragment>
-              );
-            }
-
-            if (
-              d._from === auth.id.toString() &&
-              d._to === chosedChat.toString()
-            ) {
-              return (
-                <Fragment key={index2}>
-                  {index2 === 0 && (
-                    <div className={styles.date}>
-                      {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format("LLL")}
-                    </div>
-                  )}
-                  <div className={styles.chatUser} key={index}>
-                    <div className={styles.textUser}>{d.content}</div>
-                  </div>
-                </Fragment>
-              );
-            }
-          });
-          // if (
-          //   d._to === auth.id.toString() &&
-          //   d._from === chosedChat.toString()
-          // ) {
-          //   return (
-          //     <Fragment key={index}>
-          //       <div className={styles.date}>
-          //         {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format("LLL")}
-          //       </div>
-          //       <div className={styles.chat} key={index}>
-          //         <div className={styles.profileImageWrapper}>
-          //           <img
-          //             src={getUserProfileImage(parseInt(d._from))}
-          //             alt=""
-          //             className={styles.profileImage}
-          //           />
-          //         </div>
-          //         <div className={styles.text}>{d.content}</div>
-          //       </div>
-          //     </Fragment>
-          //   );
-          // }
-
-          // if (
-          //   d._from === auth.id.toString() &&
-          //   d._to === chosedChat.toString()
-          // ) {
-          //   return (
-          //     <Fragment key={index}>
-          //       <div className={styles.date}>
-          //         {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format("LLL")}
-          //       </div>
-          //       <div className={styles.chatUser} key={index}>
-          //         <div className={styles.textUser}>{d.content}</div>
-          //       </div>
-          //     </Fragment>
-          //   );
-          // }
-        })}
-      </>
-    );
   };
 
   return (
@@ -241,7 +113,37 @@ function Message() {
                   <div className={styles.chatUser}>
                     <div className={styles.textUser}>Lorem, ipsum dolor.</div>
                   </div> */}
-                  {renderChatBox()}
+                  <div className={styles.date}>November 1, 2021 10:16 am</div>
+                  {messageList.map((d, index) => {
+                    if (
+                      d._to === auth.id.toString() &&
+                      d._from === chosedChat.toString()
+                    ) {
+                      return (
+                        <div className={styles.chat} key={index}>
+                          <div className={styles.profileImageWrapper}>
+                            <img
+                              src={getUserProfileImage(parseInt(d._from))}
+                              alt=""
+                              className={styles.profileImage}
+                            />
+                          </div>
+                          <div className={styles.text}>{d.content}</div>
+                        </div>
+                      );
+                    }
+
+                    if (
+                      d._from === auth.id.toString() &&
+                      d._to === chosedChat.toString()
+                    ) {
+                      return (
+                        <div className={styles.chatUser} key={index}>
+                          <div className={styles.textUser}>{d.content}</div>
+                        </div>
+                      );
+                    }
+                  })}
                   {/* <div className={styles.chat}>
                     <div className={styles.profileImage}></div>
                     <div className={styles.text}>

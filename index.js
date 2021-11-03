@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 const connection = require("./config/connection");
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://localhost:5000",
+    origin: "http://localhost:3000",
   },
 });
 
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
       ('', '${from}', '${to}', '${date}', '${content}')`
     );
     connection.query("SELECT * FROM chats", (err, res) => {
-      socket.emit("private message", res);
+      io.emit("private message", res);
     });
   });
 });

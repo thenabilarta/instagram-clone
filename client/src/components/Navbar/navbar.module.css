@@ -24,10 +24,12 @@
 
 .logo {
   margin-top: 7px;
+  cursor: pointer;
 }
 
 .menuWrapper {
   display: flex;
+  align-items: center;
 }
 
 .menuIcon {
@@ -46,6 +48,7 @@
   border-radius: 11px;
   margin: 0 0.8rem;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .profilePicture img {

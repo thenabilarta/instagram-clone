@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Form, Input, Button, Row, Alert } from "antd";
-import { useDispatch } from "react-redux";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import loginBanner from "../../assets/instagramloginbanner.png";
 import logo from "../../assets/loginlogo.png";
 import styles from "./login.module.css";
+import { loginUser } from "../../store/actions/auth";
 
 const Login = () => {
   const [isError, setIsError] = useState(false);
   const [imageListCounter, setImageListCounter] = useState(0);
 
+  const auth = useSelector((state) => state.auth);
+
   const history = useHistory();
+
+  useEffect(() => {
+    if (auth.isLoggedIn) {
+      history.push("/");
+    }
+  }, [auth.isLoggedIn, history]);
+
+  console.log(auth);
 
   const dispatch = useDispatch();
 
@@ -23,11 +33,16 @@ const Login = () => {
       password: values.password,
     };
 
-    axios
-      .post("http://localhost:5000/api/users/login", dataToSubmit)
-      .then((res) => {
-        console.log(res.data);
-      });
+    dispatch(loginUser(dataToSubmit)).then((res) => {
+      console.log(res);
+      if (!res.payload.isLoggedIn) {
+        setIsError(true);
+      } else {
+        // document.cookie = `token=${res.payload.token};`;
+        // window.location.href = "/";
+        history.push("/");
+      }
+    });
 
     // setIsError(false);
 

@@ -1,0 +1,42 @@
+import axios from "axios";
+import { LOGIN_USER, LOGOUT_USER, AUTH_USER } from "../types";
+import { eraseCookie, readCookie } from "../../utils/utils";
+
+export const loginUser = (dataToSubmit) => {
+  const request = axios
+    .post("http://localhost:5000/api/users/login", dataToSubmit, {
+      withCredentials: true,
+    })
+    .then((res) => res.data);
+
+  return {
+    type: LOGIN_USER,
+    payload: request,
+  };
+};
+
+export const logoutUser = () => {
+  eraseCookie("token");
+
+  return {
+    type: LOGOUT_USER,
+  };
+};
+
+export const auth = () => {
+  const request = axios
+    .get("http://localhost:5000/api/users/auth", {
+      headers: {
+        Authorization: `Bearer ${readCookie("token")}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch(function (error) {
+      console.log(error.response);
+    });
+
+  return {
+    type: AUTH_USER,
+    payload: request,
+  };
+};

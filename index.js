@@ -1,72 +1,56 @@
 const express = require("express");
+const app = express();
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
+const httpServer = require("http").createServer(app);
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const connection = require("./config/connection");
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "http://localhost:5000",
+  },
+});
 
-const app = express();
-
-app.use(cors({ credentials: true, origin: true }));
+app.use(
+  cors({
+    credentials: true,
+    origin: true,
+  })
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use("/api/users", require("./routes/users"));
+app.use("/api/feeds", require("./routes/feeds"));
+app.use("/api/comments", require("./routes/comments"));
 
-app.post("/token", (req, res) => {
-  console.log("iht");
-  const email = req.body.email;
-  const password = req.body.password;
+app.use("/uploads", express.static(__dirname + "/uploads"));
 
-  if (email === "admin@ltd.com" && password === "123456") {
-    var token = jwt.sign(
-      { email: "admin@ltd.com", role: "admin", loggedIn: true },
-      "shhhhh"
-    );
-    res.cookie("token", token);
-    res.send({
-      loggedIn: true,
-      role: "admin",
-      token,
-    });
-    return;
-  }
+const PORT = process.env.PORT || 5000;
 
-  if (email === "user@ltd.com" && password === "123456") {
-    var token = jwt.sign(
-      { email: "user@ltd.com", role: "user", loggedIn: true },
-      "shhhhh"
-    );
-    res.cookie("token", token);
-    res.send({
-      loggedIn: true,
-      role: "user",
-      token,
-    });
-    return;
-  } else {
-    return res.send({
-      loggedIn: false,
-    });
-  }
-});
+httpServer.listen(PORT, () =>
+  console.log(`server listening at http://localhost:${PORT}`)
+);
 
-app.get("/api/user", (req, res) => {
-  const _token = req.get("authorization");
-  const token = _token.split(" ")[1];
-
-  jwt.verify(token, "shhhhh", function (err, decode) {
-    if (!decode) {
-      return res.json({
-        loggedIn: false,
-        error: true,
-      });
-    } else {
-      console.log("LOGIN");
-    }
+io.on("connection", (socket) => {
+  connection.query("SELECT * FROM chats", (err, res) => {
+    socket.emit("private message", res);
   });
-});
 
-app.listen(5000, () => {
-  console.log("listening");
+  socket.on("private message", (data) => {
+    const from = data.from;
+    const to = data.to;
+    const date = data.date;
+    const content = data.content;
+
+    connection.query(
+      `INSERT INTO chats
+      (id, _from, _to, date, content) VALUES 
+      ('', '${from}', '${to}', '${date}', '${content}')`
+    );
+    connection.query("SELECT * FROM chats", (err, res) => {
+      socket.emit("private message", res);
+    });
+  });
 });

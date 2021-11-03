@@ -135,7 +135,6 @@
 }
 
 .feedFooter {
-  height: 200px;
   padding: 6px 10px;
 }
 
@@ -152,6 +151,13 @@
 
 .feedFooterText {
   padding: 6px 10px;
+}
+
+.feedFooterComment {
+  padding: 0.6rem 1rem;
+  border-top: 1px solid #dbdbdb80;
+  /* background-color: red; */
+  display: flex;
 }
 
 .rightWrapperHeader {

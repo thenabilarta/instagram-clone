@@ -7,12 +7,13 @@ let auth = (req, res, next) => {
   jwt.verify(token, "shhhhh", function (err, decode) {
     if (!decode) {
       return res.json({
-        loggedIn: false,
-        error: true,
+        isLoggedIn: false,
+        role: "none",
       });
     }
 
     req.token = token;
+    req.decode = decode;
     next();
   });
 };

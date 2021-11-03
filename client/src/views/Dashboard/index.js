@@ -1,15 +1,47 @@
-import React, { useLayoutEffect, useState } from "react";
-import {
-  HeartOutlined,
-  CommentOutlined,
-  MessageOutlined,
-  BookOutlined,
-} from "@ant-design/icons";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import axios from "axios";
 import styles from "./dashboard.module.css";
-import oldtrafford from "../../assets/oldtrafford.jpg";
-import kacangpanjang from "../../assets/kacangpanjang.jpg";
+import Navbar from "../../components/Navbar";
+import Story from "../../components/Story";
+import Feed from "../../components/Feed";
+import { useSelector } from "react-redux";
+import { readCookie } from "../../utils/utils";
 
-function index() {
+function Dashboard() {
+  const [feeds, setFeeds] = useState([]);
+  const [userStory, setUserStory] = useState([]);
+
+  const auth = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    fetchFeed();
+    fetchUser();
+  }, []);
+
+  const fetchFeed = () => {
+    axios
+      .get("http://localhost:5000/api/feeds", {
+        headers: {
+          Authorization: `Bearer ${readCookie("token")}`,
+        },
+      })
+      .then((res) => {
+        setFeeds(res.data);
+      });
+  };
+
+  const fetchUser = () => {
+    axios
+      .get("http://localhost:5000/api/users", {
+        headers: {
+          Authorization: `Bearer ${readCookie("token")}`,
+        },
+      })
+      .then((res) => {
+        setUserStory(res.data);
+      });
+  };
+
   function useWindowSize() {
     const [size, setSize] = useState([0]);
     useLayoutEffect(() => {
@@ -37,11 +69,11 @@ function index() {
         >
           <div className={styles.rightWrapperHeader}>
             <div className={styles.rightWrapperHeaderImageWrapper}>
-              <img src={kacangpanjang} alt="" />
+              <img src={auth.profilePic} alt="" />
             </div>
             <div className={styles.rightWrapperHeaderText}>
-              <p>@kacangpanjang</p>
-              <p>Kacang panjang Official</p>
+              <p>@{auth.username}</p>
+              <p>{auth.email}</p>
             </div>
           </div>
           <div className={styles.rightWrapperFooter}>
@@ -57,55 +89,28 @@ function index() {
   }
 
   return (
-    <div className={styles.dashboardWrapper}>
-      <div className={styles.leftWrapper}>
-        <div className={styles.storyWrapper}>
-          <div className={styles.story}>
-            <div className={styles.storyLine}>
-              <div className={styles.storyImage}>
-                <img src={kacangpanjang} alt="" />
-              </div>
+    <>
+      <Navbar />
+      <div className="mainWrapper">
+        <div className={styles.dashboardWrapper}>
+          <div className={styles.leftWrapper}>
+            <div className={styles.storyWrapper}>
+              {userStory.length > 0 &&
+                userStory.map((user) => (
+                  <Story user={user} key={user.username} />
+                ))}
+              <Story />
             </div>
-            <div className={styles.storyUsername}>
-              <p>kacangpanjang</p>
-            </div>
+            {feeds.length > 0 &&
+              feeds.map((feed) => (
+                <Feed feed={feed} key={feed.id} fetchFeed={fetchFeed} />
+              ))}
           </div>
-        </div>
-        <div className={styles.feedWrapper}>
-          <div className={styles.feedHeader}>
-            <div className={styles.feedHeaderImageWrapper}>
-              <img src={kacangpanjang} alt="" />
-            </div>
-            <p className={styles.feedUsername}>kacangpanjang</p>
-          </div>
-          <div className={styles.feed}>
-            <img src={oldtrafford} alt="" />
-          </div>
-          <div className={styles.feedFooter}>
-            <div className={styles.feedFooterIconWrapper}>
-              <div>
-                <HeartOutlined className={styles.feedFooterIcon} />
-                <CommentOutlined className={styles.feedFooterIcon} />
-                <MessageOutlined className={styles.feedFooterIcon} />
-              </div>
-              <div>
-                <BookOutlined className={styles.feedFooterIcon} />
-              </div>
-            </div>
-            <div className={styles.feedFooterText}>
-              <div>20 likes</div>
-              <div>
-                <strong>anonim</strong> Joke Mingguan
-              </div>
-              <div>9 HOURS AGO</div>
-              <div>Add a comment...</div>
-            </div>
-          </div>
+          {ShowRightProfile()}
         </div>
       </div>
-      {ShowRightProfile()}
-    </div>
+    </>
   );
 }
 
-export default index;
+export default Dashboard;

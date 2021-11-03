@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
-import pageReducer from "./page";
+import authReducer from "./auth";
 
 const RootReducer = combineReducers({
-  page: pageReducer,
+  auth: authReducer,
 });
 
 export default RootReducer;

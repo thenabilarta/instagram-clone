@@ -24,6 +24,7 @@ app.use(cookieParser());
 app.use("/api/users", require("./routes/users"));
 app.use("/api/feeds", require("./routes/feeds"));
 app.use("/api/comments", require("./routes/comments"));
+app.use("/api/likes", require("./routes/likes"));
 
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
@@ -39,6 +40,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("private message", (data) => {
+    console.log(data);
     const from = data.from;
     const to = data.to;
     const date = data.date;

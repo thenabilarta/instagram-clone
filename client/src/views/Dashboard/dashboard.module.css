@@ -3,6 +3,25 @@
   position: relative;
 }
 
+@media screen and (max-width: 639px) {
+  .dashboardWrapper {
+    padding: 0 14px !important;
+  }
+}
+
+@media screen and (max-width: 933px) {
+  .dashboardWrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .leftWrapper {
+    margin-right: 0px !important;
+    max-width: 614px;
+    padding-bottom: 30px;
+  }
+}
+
 .leftWrapper {
   margin-right: 28px;
   max-width: 614px;

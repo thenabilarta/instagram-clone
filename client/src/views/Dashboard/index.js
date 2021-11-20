@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import axios from "axios";
 import styles from "./dashboard.module.css";
 import Navbar from "../../components/Navbar";
+import NavbarMobile from "../../components/NavbarMobile";
 import Story from "../../components/Story";
 import Feed from "../../components/Feed";
 import { useSelector } from "react-redux";
@@ -26,6 +27,7 @@ function Dashboard() {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setFeeds(res.data);
       });
   };
@@ -54,6 +56,8 @@ function Dashboard() {
     }, []);
     return size;
   }
+
+  const [width] = useWindowSize();
 
   function ShowRightProfile(props) {
     const [width] = useWindowSize();
@@ -91,6 +95,7 @@ function Dashboard() {
   return (
     <>
       <Navbar />
+      {width < 640 && <NavbarMobile />}
       <div className="mainWrapper">
         <div className={styles.dashboardWrapper}>
           <div className={styles.leftWrapper}>
@@ -103,7 +108,12 @@ function Dashboard() {
             </div>
             {feeds.length > 0 &&
               feeds.map((feed) => (
-                <Feed feed={feed} key={feed.id} fetchFeed={fetchFeed} />
+                <Feed
+                  feed={feed}
+                  key={feed.id}
+                  fetchFeed={fetchFeed}
+                  userId={auth.id}
+                />
               ))}
           </div>
           {ShowRightProfile()}

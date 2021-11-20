@@ -1,31 +1,100 @@
 /* eslint-disable array-callback-return */
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment, useRef } from "react";
 import { Row, Button } from "antd";
 import axios from "axios";
 import { MessageOutlined, SendOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar";
 import styles from "./message.module.css";
 import { readCookie } from "../../utils/utils";
-import socket from "../../socket";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 function Message() {
   const [hasMessage, setHasMessage] = useState(false);
   const [userList, setUserList] = useState([]);
+  const [_messageList, _setMessageList] = useState([]);
   const [messageList, setMessageList] = useState([]);
   const [chosedChat, setChosedChat] = useState(null);
+  const [chosedChatUsername, setChosedChatUsername] = useState("");
   const [message, setMessage] = useState("");
 
+  const URL = "http://localhost:5000";
+  const socket = useRef(null);
+
+  const divRef = useRef(null);
+
   useEffect(() => {
-    fetchUser();
-    socket.connect();
-    socket.on("private message", (res) => {
-      setMessageList(res);
-    });
+    let mounted = true;
+    if (mounted) {
+      fetchUser();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      socket.current = io(URL, { autoConnect: false });
+      socket.current.connect();
+      socket.current.on("private message", (res) => {
+        _setMessageList(res);
+      });
+      socket.current.onAny((event, ...args) => {
+        console.log(event, args);
+      });
+    }
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const auth = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (chosedChat) {
+      userList.map((u) => {
+        if (u.id === chosedChat) {
+          setChosedChatUsername(u.username);
+        }
+      });
+    }
+
+    const msgData = [];
+    let currentDate;
+    _messageList.forEach((m, index) => {
+      if (m._to === auth.id.toString() || m._from === auth.id.toString()) {
+        if (chosedChat !== null) {
+          if (
+            m._to === chosedChat.toString() ||
+            m._from === chosedChat.toString()
+          ) {
+            if (msgData.length === 0) {
+              currentDate = moment(m.date, "DD-MM-YYYYTHH-mm-ss");
+              msgData.push({ ...m, showDate: true });
+            } else if (index !== 0) {
+              if (
+                moment(currentDate).isSame(
+                  moment(m.date, "DD-MM-YYYYTHH-mm-ss"),
+                  "day"
+                )
+              ) {
+                msgData.push({ ...m, showDate: false });
+              } else {
+                currentDate = moment(m.date, "DD-MM-YYYYTHH-mm-ss");
+                msgData.push({ ...m, showDate: true });
+              }
+            }
+          }
+        }
+      }
+    });
+    setMessageList(msgData);
+  }, [_messageList, auth.id, chosedChat, userList]);
+
+  useEffect(() => {
+    if (divRef.current !== null && messageList.length > 0) {
+      divRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
+      });
+    }
+  }, [messageList]);
 
   function getUserProfileImage(id) {
     let src;
@@ -45,7 +114,6 @@ function Message() {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setUserList(res.data);
       });
   };
@@ -106,30 +174,35 @@ function Message() {
                   className={styles.rightHeader}
                   onClick={() => setHasMessage(false)}
                 >
-                  username
+                  {chosedChatUsername}
                 </Row>
                 <div className={styles.chatbox}>
-                  {/* <div className={styles.date}>August 15, 1946 10:16 am</div>
-                  <div className={styles.chatUser}>
-                    <div className={styles.textUser}>Lorem, ipsum dolor.</div>
-                  </div> */}
-                  <div className={styles.date}>November 1, 2021 10:16 am</div>
                   {messageList.map((d, index) => {
                     if (
                       d._to === auth.id.toString() &&
                       d._from === chosedChat.toString()
                     ) {
                       return (
-                        <div className={styles.chat} key={index}>
-                          <div className={styles.profileImageWrapper}>
-                            <img
-                              src={getUserProfileImage(parseInt(d._from))}
-                              alt=""
-                              className={styles.profileImage}
-                            />
+                        <Fragment key={index}>
+                          {d.showDate && (
+                            <div className={styles.date}>
+                              {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format(
+                                "dddd, MMMM Do YYYY"
+                              )}
+                            </div>
+                          )}
+
+                          <div className={styles.chat}>
+                            <div className={styles.profileImageWrapper}>
+                              <img
+                                src={getUserProfileImage(parseInt(d._from))}
+                                alt=""
+                                className={styles.profileImage}
+                              />
+                            </div>
+                            <div className={styles.text}>{d.content}</div>
                           </div>
-                          <div className={styles.text}>{d.content}</div>
-                        </div>
+                        </Fragment>
                       );
                     }
 
@@ -138,48 +211,22 @@ function Message() {
                       d._to === chosedChat.toString()
                     ) {
                       return (
-                        <div className={styles.chatUser} key={index}>
-                          <div className={styles.textUser}>{d.content}</div>
-                        </div>
+                        <Fragment key={index}>
+                          {d.showDate && (
+                            <div className={styles.date}>
+                              {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format(
+                                "dddd, MMMM Do YYYY"
+                              )}
+                            </div>
+                          )}
+                          <div className={styles.chatUser}>
+                            <div className={styles.textUser}>{d.content}</div>
+                          </div>
+                        </Fragment>
                       );
                     }
                   })}
-                  {/* <div className={styles.chat}>
-                    <div className={styles.profileImage}></div>
-                    <div className={styles.text}>
-                      Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                      Minus sed sunt dolor tenetur deleniti quos ipsum
-                      architecto, et nisi cupiditate voluptatum vitae dolorem
-                      ad, ut perferendis sequi nemo, ullam explicabo!
-                    </div>
-                  </div>
-                  <div className={styles.chat}>
-                    <div className={styles.profileImage}></div>
-                    <div className={styles.text}>
-                      Lorem ipsum, dolor sit amet consectetur.
-                    </div>
-                  </div>
-                  <div className={styles.chatUser}>
-                    <div className={styles.textUser}>Lorem, ipsum dolor.</div>
-                  </div>
-                  <div className={styles.chat}>
-                    <div className={styles.profileImage}></div>
-                    <div className={styles.text}>
-                      Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                      Minus sed sunt dolor tenetur deleniti quos ipsum
-                      architecto, et nisi cupiditate voluptatum vitae dolorem
-                      ad, ut perferendis sequi nemo, ullam explicabo!
-                    </div>
-                  </div>
-                  <div className={styles.chat}>
-                    <div className={styles.profileImage}></div>
-                    <div className={styles.text}>
-                      Lorem ipsum, dolor sit amet consectetur.
-                    </div>
-                  </div>
-                  <div className={styles.chatUser}>
-                    <div className={styles.textUser}>Lorem, ipsum dolor.</div>
-                  </div> */}
+                  <div ref={divRef}></div>
                 </div>
                 <div className={styles.chatInputWrapper}>
                   <div className={styles.chatInput}>
@@ -191,7 +238,8 @@ function Message() {
                       placeholder="Message..."
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                          socket.emit("private message", {
+                          console.log(message);
+                          socket.current.emit("private message", {
                             content: message,
                             from: auth.id,
                             to: chosedChat,
@@ -204,7 +252,7 @@ function Message() {
                     <SendOutlined
                       className={styles.sendIcon}
                       onClick={() => {
-                        socket.emit("private message", {
+                        socket.current.emit("private message", {
                           content: message,
                           from: auth.id,
                           to: chosedChat,

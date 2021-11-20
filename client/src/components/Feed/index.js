@@ -5,16 +5,20 @@ import {
   HeartOutlined,
   CommentOutlined,
   MessageOutlined,
-  BookOutlined,
+  HeartFilled,
 } from "@ant-design/icons";
 import kacangpanjang from "../../assets/kacangpanjang.jpg";
 import axios from "axios";
 import { readCookie } from "../../utils/utils";
 import moment from "moment";
+import { useHistory } from "react-router-dom";
 
-const Feed = ({ feed, fetchFeed }) => {
+const Feed = ({ feed, fetchFeed, userId }) => {
   const [comment, setComment] = useState("");
   const [openComment, setOpenComment] = useState(false);
+  const [activeLike, setActiveLike] = useState(false);
+
+  const history = useHistory();
 
   const hoursPosted = () => {
     const hour = (moment().unix() - feed.created_at) / 3600;
@@ -36,7 +40,7 @@ const Feed = ({ feed, fetchFeed }) => {
     }
 
     if (hour > 24 * 7) {
-      return Math.floor(hour / 24) + " MORE THAN A WEEK AGO";
+      return "MORE THAN A WEEK AGO";
     }
   };
 
@@ -56,6 +60,53 @@ const Feed = ({ feed, fetchFeed }) => {
         setComment("");
         fetchFeed();
       });
+  };
+
+  const likeAPost = (feed_id, owner, user_id) => {
+    axios
+      .post(
+        "http://localhost:5000/api/likes",
+        { feed_id, owner, user_id },
+        {
+          headers: {
+            Authorization: `Bearer ${readCookie("token")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        // setComment("");
+        if (res.data.status === "error") {
+          return;
+        } else {
+          fetchFeed();
+        }
+      });
+  };
+
+  const unlikeAPost = (feed_id, user_id) => {
+    axios
+      .post(
+        "http://localhost:5000/api/likes/unlike",
+        { feed_id, user_id },
+        {
+          headers: {
+            Authorization: `Bearer ${readCookie("token")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        fetchFeed();
+      });
+  };
+
+  const onUsernameClick = (id) => {
+    if (userId === id) {
+      history.push("/profile");
+    } else {
+      history.push("/profile/" + id);
+    }
   };
 
   const renderComment = (feed) => {
@@ -109,24 +160,60 @@ const Feed = ({ feed, fetchFeed }) => {
             alt=""
           />
         </div>
-        <p className={styles.feedUsername}>{feed.username}</p>
+        <p
+          className={styles.feedUsername}
+          onClick={() => onUsernameClick(feed.user_id)}
+        >
+          {feed.username}
+        </p>
       </div>
-      <div className={styles.feed}>
+      <div
+        className={styles.feed}
+        onDoubleClick={() => {
+          setActiveLike(true);
+          setTimeout(() => {
+            setActiveLike(false);
+          }, 500);
+          likeAPost(feed.id, feed.user_id, userId);
+        }}
+      >
         <img src={feed.image_url} alt="" />
+        <HeartFilled className={activeLike ? styles.active : ""} />
       </div>
       <div className={styles.feedFooter}>
         <div className={styles.feedFooterIconWrapper}>
           <div>
-            <HeartOutlined className={styles.feedFooterIcon} />
+            {feed.likes.includes(userId) ? (
+              <HeartFilled
+                className={styles.feedFooterIcon}
+                style={{ color: "red" }}
+                onClick={() => {
+                  console.log("unlike");
+                  unlikeAPost(feed.id, userId);
+                }}
+              />
+            ) : (
+              <HeartOutlined
+                className={styles.feedFooterIcon}
+                onClick={() => {
+                  console.log("like");
+                  setActiveLike(true);
+                  setTimeout(() => {
+                    setActiveLike(false);
+                  }, 500);
+                  likeAPost(feed.id, feed.user_id, userId);
+                }}
+              />
+            )}
+
             <CommentOutlined className={styles.feedFooterIcon} />
             <MessageOutlined className={styles.feedFooterIcon} />
           </div>
-          <div>
-            <BookOutlined className={styles.feedFooterIcon} />
-          </div>
         </div>
         <div className={styles.feedFooterText}>
-          <p style={{ marginBottom: 0 }}>20 likes</p>
+          {feed.likes.length > 0 && (
+            <p style={{ marginBottom: 0 }}>{feed.likes.length} likes</p>
+          )}
           <div>
             <strong>{feed.username}</strong> {feed.caption}
           </div>

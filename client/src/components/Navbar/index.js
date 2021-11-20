@@ -10,8 +10,8 @@ import {
   PlusCircleOutlined,
   PlusCircleFilled,
 } from "@ant-design/icons";
-import { Input } from "antd";
 import { useSelector } from "react-redux";
+import { Fragment } from "react";
 
 function Navbar() {
   const history = useHistory();
@@ -22,9 +22,9 @@ function Navbar() {
 
   const state = useSelector((state) => state);
 
-  const onChange = (e) => {
-    console.log(e);
-  };
+  // const onChange = (e) => {
+  //   console.log(e);
+  // };
 
   return (
     <div className={styles.navbarWrapper}>
@@ -38,13 +38,40 @@ function Navbar() {
               alt=""
             />
           </div>
-          <div className={styles.inputWrapper}>
+          {/* <div className={styles.inputWrapper}>
             <Input placeholder="Search" allowClear onChange={onChange} />
-          </div>
+          </div> */}
           <div className={styles.menuWrapper}>
             {path === "/" ? (
               <>
                 <HomeFilled className={styles.menuIcon} />
+              </>
+            ) : (
+              <>
+                <HomeOutlined
+                  className={styles.menuIcon}
+                  onClick={() => {
+                    history.push("/");
+                  }}
+                />
+              </>
+            )}
+
+            {path === "/message" ? (
+              <MessageFilled className={styles.menuIcon} />
+            ) : (
+              <MessageOutlined
+                className={styles.menuIcon}
+                onClick={() => {
+                  history.push("/message");
+                }}
+              />
+            )}
+
+            {path === "/create" ? (
+              <PlusCircleFilled className={styles.menuIcon} />
+            ) : (
+              <Fragment>
                 <input
                   type="file"
                   style={{ display: "none" }}
@@ -64,32 +91,9 @@ function Navbar() {
                 <label htmlFor="inputPost" className={styles.menuIcon}>
                   <PlusCircleOutlined />
                 </label>
-              </>
-            ) : (
-              <>
-                <HomeOutlined
-                  className={styles.menuIcon}
-                  onClick={() => {
-                    history.push("/");
-                  }}
-                />
-              </>
+              </Fragment>
             )}
 
-            {path === "/reate" && (
-              <PlusCircleFilled className={styles.menuIcon} />
-            )}
-
-            {path === "/message" ? (
-              <MessageFilled className={styles.menuIcon} />
-            ) : (
-              <MessageOutlined
-                className={styles.menuIcon}
-                onClick={() => {
-                  history.push("/message");
-                }}
-              />
-            )}
             <HeartOutlined className={styles.menuIcon} />
             <div
               className={styles.profilePicture}

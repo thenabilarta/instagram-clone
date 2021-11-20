@@ -1,37 +1,49 @@
 import { useEffect, useState } from "react";
-import { logoutUser } from "../../store/actions/auth";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Navbar from "../../components/Navbar";
 import styles from "./profile.module.css";
 import axios from "axios";
 import { readCookie } from "../../utils/utils";
-import { Button } from "antd";
+import { useParams } from "react-router-dom";
 
 function Profile() {
-  const dispatch = useDispatch();
   const [userFeeds, setUserFeeds] = useState([]);
+  const [userProfile, setUserProfile] = useState({});
 
   const state = useSelector((state) => state.auth);
 
+  const params = useParams();
+
   useEffect(() => {
     fetchFeed();
-
+    fetchUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fetchUser = () => {
+    axios
+      .get("http://localhost:5000/api/users/" + params.id, {
+        headers: {
+          Authorization: `Bearer ${readCookie("token")}`,
+        },
+      })
+      .then((res) => {
+        console.log("user", res.data);
+        setUserProfile(res.data[0]);
+      });
+  };
+
   const fetchFeed = () => {
-    if (state.id) {
-      axios
-        .get(`http://localhost:5000/api/feeds/${state.id}`, {
-          headers: {
-            Authorization: `Bearer ${readCookie("token")}`,
-          },
-        })
-        .then((res) => {
-          console.log(res.data);
-          setUserFeeds(res.data);
-        });
-    }
+    axios
+      .get(`http://localhost:5000/api/feeds/${params.id}`, {
+        headers: {
+          Authorization: `Bearer ${readCookie("token")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setUserFeeds(res.data);
+      });
   };
 
   console.log(state);
@@ -44,22 +56,14 @@ function Profile() {
           <div className={styles.profileHeader}>
             <div className={styles.profilePictureWrapper}>
               <div className={styles.profilePicture}>
-                {state.profilePic && <img src={state.profilePic} alt="" />}
+                {userProfile.profilePictureSRC && (
+                  <img src={userProfile.profilePictureSRC} alt="" />
+                )}
               </div>
             </div>
             <div className={styles.profileDescriptionWrapper}>
               <div className={styles.username}>
-                {state.username && state.username}
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    console.log("logout");
-                    dispatch(logoutUser());
-                    window.location.reload();
-                  }}
-                >
-                  Logout
-                </Button>
+                {userProfile.username && userProfile.username}
               </div>
               <div className={styles.info}>
                 <p className={styles.descriptionText}>

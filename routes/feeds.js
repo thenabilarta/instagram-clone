@@ -23,25 +23,43 @@ router.get("/", auth, (req, res) => {
 
   connection.query(sqlQuery, (err, data) => {
     const sqlQuery2 = `SELECT * FROM comments`;
+    const sqlQuery3 = `SELECT * FROM likes`;
     connection.query(sqlQuery2, (err, data2) => {
-      const result = [];
+      connection.query(sqlQuery3, (err, data3) => {
+        const result = [];
 
-      data.map((d) => {
-        const comments = [];
-        data2.map((d2) => {
-          if (d.id === d2.post_id) {
-            comments.push(d2);
-          }
+        data.map((d) => {
+          const comments = [];
+          let likes = [];
+          data2.map((d2) => {
+            if (d.id === d2.post_id) {
+              comments.push(d2);
+            }
+          });
+
+          data3.map((d2) => {
+            if (d2.post_id === d.id) {
+              likes.push(d2.liked_by_user_id);
+            }
+          });
+          result.push({ ...d, comments, likes });
         });
-        result.push({ ...d, comments });
-      });
 
-      if (err) {
-        res.send(err);
-      } else {
-        res.send(result);
-      }
+        if (err) {
+          res.send(err);
+        } else {
+          res.send(result);
+        }
+      });
     });
+  });
+});
+
+router.get("/:id", auth, (req, res) => {
+  const sqlQuery = `SELECT * FROM feeds WHERE user_id = ${req.params.id} ORDER BY feeds.id DESC`;
+
+  connection.query(sqlQuery, (err, data) => {
+    res.send(data);
   });
 });
 

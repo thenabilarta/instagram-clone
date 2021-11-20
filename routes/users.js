@@ -104,4 +104,15 @@ router.get("/", auth, (req, res) => {
   });
 });
 
+router.get("/:id", auth, (req, res) => {
+  const params = req.params.id;
+
+  const sqlQuery = `SELECT id, username, profilePictureSRC FROM users WHERE id = ${params}`;
+
+  connection.query(sqlQuery, (err, data) => {
+    if (err) console.log(err);
+    res.send(data);
+  });
+});
+
 module.exports = router;

@@ -4,6 +4,7 @@ import Dashboard from "./views/Dashboard";
 import Message from "./views/Message";
 import Create from "./views/Create";
 import Profile from "./views/Profile";
+import OtherProfile from "./views/OtherProfile";
 import Login from "./views/Login";
 import Register from "./views/Register";
 
@@ -17,6 +18,7 @@ function App() {
       <Switch>
         <Route exact path="/message" component={Auth(Message, null)} />
         <Route exact path="/create" component={Auth(Create, null)} />
+        <Route exact path="/profile/:id" component={Auth(OtherProfile, null)} />
         <Route exact path="/profile" component={Auth(Profile, null)} />
         <Route exact path="/" component={Auth(Dashboard, null)} />
         <Route exact path="/login" component={Auth(Login, null)} />

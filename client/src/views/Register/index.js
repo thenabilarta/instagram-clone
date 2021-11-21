@@ -4,7 +4,7 @@ import axios from "axios";
 import { Form, Input, Button, Row, Alert, notification } from "antd";
 import logo from "../../assets/loginlogo.png";
 import styles from "./register.module.css";
-import { URL } from "../../config/env";
+import { REACTURL } from "../../config/env";
 
 const Login = () => {
   const [isError, setIsError] = useState(false);
@@ -26,7 +26,7 @@ const Login = () => {
     };
 
     axios
-      .post(`${URL}/api/users/register`, dataToSubmit)
+      .post(`${REACTURL}/api/users/register`, dataToSubmit)
       .then((res) => {
         console.log(res.data);
         openNotificationWithIcon("success", "Success", "User has been created");

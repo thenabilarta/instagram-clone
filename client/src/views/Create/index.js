@@ -9,7 +9,7 @@ import Navbar from "../../components/Navbar";
 import NavbarMobile from "../../components/NavbarMobile";
 import styles from "./create.module.css";
 import { readCookie } from "../../utils/utils";
-import { URL } from "../../config/env";
+import { REACTURL } from "../../config/env";
 
 function Create({ location }) {
   console.log(location.state.media);
@@ -52,7 +52,7 @@ function Create({ location }) {
     formData.append("caption", caption);
 
     axios
-      .post(`${URL}/api/feeds`, formData, config)
+      .post(`${REACTURL}/api/feeds`, formData, config)
       .then((res) => {
         console.log(res.data);
         openNotificationWithIcon("success", "Success", "Post has been created");

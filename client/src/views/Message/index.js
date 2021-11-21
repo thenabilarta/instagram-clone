@@ -10,7 +10,7 @@ import { readCookie } from "../../utils/utils";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
-import { URL } from "../../config/env";
+import { REACTURL } from "../../config/env";
 
 function Message() {
   const [hasMessage, setHasMessage] = useState(false);
@@ -23,7 +23,7 @@ function Message() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [mobileMode, setMobileMode] = useState(false);
 
-  const SOCKETURL = URL;
+  const SOCKETREACTURL = REACTURL;
   const socket = useRef(null);
 
   const divRef = useRef(null);
@@ -33,7 +33,7 @@ function Message() {
     if (mounted) {
       fetchUser();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      socket.current = io(SOCKETURL, { autoConnect: false });
+      socket.current = io(SOCKETREACTURL, { autoConnect: false });
       socket.current.connect();
       socket.current.on("private message", (res) => {
         _setMessageList(res);
@@ -113,7 +113,7 @@ function Message() {
 
   const fetchUser = () => {
     axios
-      .get(`${URL}/api/users`, {
+      .get(`${REACTURL}/api/users`, {
         headers: {
           Authorization: `Bearer ${readCookie("token")}`,
         },

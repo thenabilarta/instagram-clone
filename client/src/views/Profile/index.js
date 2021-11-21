@@ -7,7 +7,7 @@ import styles from "./profile.module.css";
 import axios from "axios";
 import { readCookie } from "../../utils/utils";
 import { Button } from "antd";
-import { URL } from "../../config/env";
+import { REACTURL } from "../../config/env";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -25,7 +25,7 @@ function Profile() {
   const fetchFeed = () => {
     if (state.id) {
       axios
-        .get(`${URL}/api/feeds/${state.id}`, {
+        .get(`${REACTURL}/api/feeds/${state.id}`, {
           headers: {
             Authorization: `Bearer ${readCookie("token")}`,
           },

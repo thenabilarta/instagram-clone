@@ -1,11 +1,11 @@
 import axios from "axios";
 import { LOGIN_USER, LOGOUT_USER, AUTH_USER } from "../types";
 import { eraseCookie, readCookie } from "../../utils/utils";
-import { URL } from "../../config/env";
+import { REACTURL } from "../../config/env";
 
 export const loginUser = (dataToSubmit) => {
   const request = axios
-    .post(`${URL}/api/users/login`, dataToSubmit, {
+    .post(`${REACTURL}/api/users/login`, dataToSubmit, {
       withCredentials: true,
     })
     .then((res) => res.data);
@@ -26,7 +26,7 @@ export const logoutUser = () => {
 
 export const auth = () => {
   const request = axios
-    .get(`${URL}/api/users/auth`, {
+    .get(`${REACTURL}/api/users/auth`, {
       headers: {
         Authorization: `Bearer ${readCookie("token")}`,
       },

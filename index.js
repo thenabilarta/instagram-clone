@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const cors = require("cors");
 const httpServer = require("http").createServer(app);
 const bodyParser = require("body-parser");
@@ -27,6 +28,12 @@ app.use("/api/comments", require("./routes/comments"));
 app.use("/api/likes", require("./routes/likes"));
 
 app.use("/uploads", express.static(__dirname + "/uploads"));
+
+app.use(express.static(path.join(__dirname, "/client/build")));
+
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "/client/build/index.html"))
+);
 
 const PORT = process.env.PORT || 5000;
 

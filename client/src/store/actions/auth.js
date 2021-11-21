@@ -1,10 +1,11 @@
 import axios from "axios";
 import { LOGIN_USER, LOGOUT_USER, AUTH_USER } from "../types";
 import { eraseCookie, readCookie } from "../../utils/utils";
+import { URL } from "../../config/env";
 
 export const loginUser = (dataToSubmit) => {
   const request = axios
-    .post("http://localhost:5000/api/users/login", dataToSubmit, {
+    .post(`${URL}/api/users/login`, dataToSubmit, {
       withCredentials: true,
     })
     .then((res) => res.data);
@@ -25,7 +26,7 @@ export const logoutUser = () => {
 
 export const auth = () => {
   const request = axios
-    .get("http://localhost:5000/api/users/auth", {
+    .get(`${URL}/api/users/auth`, {
       headers: {
         Authorization: `Bearer ${readCookie("token")}`,
       },

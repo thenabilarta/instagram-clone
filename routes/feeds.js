@@ -3,6 +3,7 @@ const router = express.Router();
 const connection = require("../config/connection");
 const moment = require("moment");
 const multer = require("multer");
+require("dotenv").config();
 
 const { auth } = require("../middleware/auth");
 
@@ -19,6 +20,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.get("/", auth, (req, res) => {
+  console.log(process.env.IMAGE_URL);
   const sqlQuery = `SELECT feeds.id, email, user_id, username, image_url, profilePictureSRC, caption, created_at FROM feeds LEFT JOIN users ON feeds.user_id=users.id GROUP BY feeds.id ORDER BY feeds.id DESC`;
 
   connection.query(sqlQuery, (err, data) => {
@@ -69,7 +71,7 @@ router.post("/", auth, upload.single("files"), (req, res) => {
 
   const caption = req.body.caption;
 
-  const imageURL = "http://localhost:5000/uploads/" + req.file.filename;
+  const imageURL = `${process.env.IMAGE_URL}/uploads/` + req.file.filename;
 
   const sqlQuery = `INSERT INTO feeds (id, user_id, image_url, stored_as, caption, liked, comment_id, location, tags_id, created_at) VALUES ('', '${id}', '${imageURL}', '', '${caption}', '', '', '', '', '${date}')`;
 

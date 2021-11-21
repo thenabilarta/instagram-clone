@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { Form, Input, Button, Row, Alert } from "antd";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +10,7 @@ import { loginUser } from "../../store/actions/auth";
 const Login = () => {
   const [isError, setIsError] = useState(false);
   const [imageListCounter, setImageListCounter] = useState(0);
+  const [mobileMode, setMobileMode] = useState(false);
 
   const auth = useSelector((state) => state.auth);
 
@@ -79,14 +80,40 @@ const Login = () => {
   const handleForgotPassword = () => {
     history.push("/forgot-password");
   };
+
+  function useWindowSize() {
+    const [size, setSize] = useState([0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }
+
+  const [width] = useWindowSize();
+
+  useEffect(() => {
+    if (width < 990) {
+      setMobileMode(true);
+    } else {
+      setMobileMode(false);
+    }
+  }, [width]);
+
   return (
     <div className={styles.loginWrapper}>
-      <div className={styles.bannerWrapper}>
-        <img className={styles.outerBanner} src={loginBanner} alt="" />
-        <div className={styles.innerBanner}>
-          <img src={imageList[imageListCounter]} alt="" />
+      {!mobileMode && (
+        <div className={styles.bannerWrapper}>
+          <img className={styles.outerBanner} src={loginBanner} alt="" />
+          <div className={styles.innerBanner}>
+            <img src={imageList[imageListCounter]} alt="" />
+          </div>
         </div>
-      </div>
+      )}
       <div className={styles.loginBoxWrapper}>
         <div className={styles.loginBox}>
           <div className={styles.loginBoxHeader}>

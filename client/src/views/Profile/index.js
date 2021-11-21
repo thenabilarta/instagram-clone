@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { logoutUser } from "../../store/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../../components/Navbar";
+import NavbarMobile from "../../components/NavbarMobile";
 import styles from "./profile.module.css";
 import axios from "axios";
 import { readCookie } from "../../utils/utils";
 import { Button } from "antd";
+import { URL } from "../../config/env";
 
 function Profile() {
   const dispatch = useDispatch();
   const [userFeeds, setUserFeeds] = useState([]);
+  const [, setMobileMode] = useState(false);
 
   const state = useSelector((state) => state.auth);
 
@@ -22,7 +25,7 @@ function Profile() {
   const fetchFeed = () => {
     if (state.id) {
       axios
-        .get(`http://localhost:5000/api/feeds/${state.id}`, {
+        .get(`${URL}/api/feeds/${state.id}`, {
           headers: {
             Authorization: `Bearer ${readCookie("token")}`,
           },
@@ -34,11 +37,33 @@ function Profile() {
     }
   };
 
-  console.log(state);
+  function useWindowSize() {
+    const [size, setSize] = useState([0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }
+
+  const [width] = useWindowSize();
+
+  useEffect(() => {
+    if (width < 990) {
+      setMobileMode(true);
+    } else {
+      setMobileMode(false);
+    }
+  }, [width]);
 
   return (
     <>
       <Navbar />
+      {width < 640 && <NavbarMobile />}
       <div className="mainWrapper">
         <div className={styles.profileWrapper}>
           <div className={styles.profileHeader}>

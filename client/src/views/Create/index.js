@@ -1,13 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { Input, Row } from "antd";
+import { useEffect, useState, useLayoutEffect } from "react";
+import { Input, Row, notification } from "antd";
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
-import kacangpanjang from "../../assets/kacangpanjang.jpg";
+import { useSelector } from "react-redux";
 import Navbar from "../../components/Navbar";
+import NavbarMobile from "../../components/NavbarMobile";
 import styles from "./create.module.css";
 import { readCookie } from "../../utils/utils";
+import { URL } from "../../config/env";
 
 function Create({ location }) {
   console.log(location.state.media);
@@ -15,8 +17,11 @@ function Create({ location }) {
   const [imageAttr, setImageAttr] = useState({});
   const [imageSRC, setImageSRC] = useState({});
   const [caption, setCaption] = useState("");
+  const [mobileMode, setMobileMode] = useState(false);
 
   const history = useHistory();
+
+  const auth = useSelector((state) => state.auth);
 
   const file = location.state.media[0];
 
@@ -26,6 +31,13 @@ function Create({ location }) {
     setImageSRC(URL.createObjectURL(file));
     setImageAttr(file);
   }, []);
+
+  const openNotificationWithIcon = (type, msg, desc) => {
+    notification[type]({
+      message: msg,
+      description: desc,
+    });
+  };
 
   const post = () => {
     const config = {
@@ -40,15 +52,49 @@ function Create({ location }) {
     formData.append("caption", caption);
 
     axios
-      .post("http://localhost:5000/api/feeds", formData, config)
-      .then((res) => console.log(res.data));
+      .post(`${URL}/api/feeds`, formData, config)
+      .then((res) => {
+        console.log(res.data);
+        openNotificationWithIcon("success", "Success", "Post has been created");
+        history.push("/");
+      })
+      .catch((err) => {
+        openNotificationWithIcon("error", "Error", "Unexpected error");
+      });
   };
+
+  function useWindowSize() {
+    const [size, setSize] = useState([0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }
+
+  const [width] = useWindowSize();
+
+  useEffect(() => {
+    if (width < 639) {
+      setMobileMode(true);
+    } else {
+      setMobileMode(false);
+    }
+  }, [width]);
 
   return (
     <>
       <Navbar />
+      {mobileMode && <NavbarMobile />}
       <div className="mainWrapper">
-        <div className={styles.createWrapper}>
+        <div
+          className={styles.createWrapper}
+          style={{ margin: mobileMode ? "0 1rem" : "auto" }}
+        >
           <div className={styles.createHeader}>
             <CloseOutlined
               className={styles.menuIcon}
@@ -66,7 +112,7 @@ function Create({ location }) {
           </div>
           <div className={styles.createBody}>
             <div className={styles.profilePicture}>
-              <img src={kacangpanjang} alt="" />
+              <img src={auth.profilePic} alt="" />
             </div>
             <div className={styles.inputWrapper}>
               <TextArea

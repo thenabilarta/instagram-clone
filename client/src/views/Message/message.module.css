@@ -8,6 +8,22 @@
   background-color: #fff;
 }
 
+@media screen and (max-width: 639px) {
+  .messageWrapper {
+    min-height: calc(100vh - 167px);
+    height: calc(100vh - 167px);
+  }
+}
+
+@media screen and (max-width: 990px) {
+  .rightHeader {
+    display: flex;
+    justify-content: space-around !important;
+    align-items: center;
+    width: 100%;
+  }
+}
+
 .leftWrapper {
   height: 100%;
   flex: 1;

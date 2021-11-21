@@ -5,6 +5,7 @@ import styles from "./profile.module.css";
 import axios from "axios";
 import { readCookie } from "../../utils/utils";
 import { useParams } from "react-router-dom";
+import { URL } from "../../config/env";
 
 function Profile() {
   const [userFeeds, setUserFeeds] = useState([]);
@@ -22,7 +23,7 @@ function Profile() {
 
   const fetchUser = () => {
     axios
-      .get("http://localhost:5000/api/users/" + params.id, {
+      .get(`${URL}/api/users/` + params.id, {
         headers: {
           Authorization: `Bearer ${readCookie("token")}`,
         },
@@ -35,7 +36,7 @@ function Profile() {
 
   const fetchFeed = () => {
     axios
-      .get(`http://localhost:5000/api/feeds/${params.id}`, {
+      .get(`${URL}/api/feeds/${params.id}`, {
         headers: {
           Authorization: `Bearer ${readCookie("token")}`,
         },

@@ -4,6 +4,13 @@
   border: 1px solid #dbdbdb;
 }
 
+@media screen and (max-width: 639px) {
+  .createWrapper {
+    min-height: calc(100vh - 167px);
+    height: calc(100vh - 167px);
+  }
+}
+
 .createHeader {
   border-bottom: 1px solid #dbdbdb;
   height: 54px;

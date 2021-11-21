@@ -1,14 +1,22 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
-import { Form, Input, Button, Row, Alert } from "antd";
+import { Form, Input, Button, Row, Alert, notification } from "antd";
 import logo from "../../assets/loginlogo.png";
 import styles from "./register.module.css";
+import { URL } from "../../config/env";
 
 const Login = () => {
   const [isError, setIsError] = useState(false);
 
   const history = useHistory();
+
+  const openNotificationWithIcon = (type, msg, desc) => {
+    notification[type]({
+      message: msg,
+      description: desc,
+    });
+  };
 
   const onSubmit = (values) => {
     let dataToSubmit = {
@@ -18,9 +26,14 @@ const Login = () => {
     };
 
     axios
-      .post("http://localhost:5000/api/users/register", dataToSubmit)
+      .post(`${URL}/api/users/register`, dataToSubmit)
       .then((res) => {
         console.log(res.data);
+        openNotificationWithIcon("success", "Success", "User has been created");
+        history.push("/login");
+      })
+      .catch((err) => {
+        console.log(err);
         setIsError(true);
       });
   };

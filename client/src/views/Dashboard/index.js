@@ -7,6 +7,7 @@ import Story from "../../components/Story";
 import Feed from "../../components/Feed";
 import { useSelector } from "react-redux";
 import { readCookie } from "../../utils/utils";
+import { URL } from "../../config/env";
 
 function Dashboard() {
   const [feeds, setFeeds] = useState([]);
@@ -21,7 +22,7 @@ function Dashboard() {
 
   const fetchFeed = () => {
     axios
-      .get("http://localhost:5000/api/feeds", {
+      .get(`${URL}/api/feeds`, {
         headers: {
           Authorization: `Bearer ${readCookie("token")}`,
         },
@@ -34,7 +35,7 @@ function Dashboard() {
 
   const fetchUser = () => {
     axios
-      .get("http://localhost:5000/api/users", {
+      .get(`${URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${readCookie("token")}`,
         },

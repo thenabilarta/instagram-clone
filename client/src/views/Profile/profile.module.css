@@ -1,3 +1,13 @@
+@media screen and (max-width: 639px) {
+  .profilePicture {
+    height: 77px !important;
+    width: 77px !important;
+    min-height: 77px !important;
+    min-width: 77px !important;
+    border-radius: 38.5px !important;
+  }
+}
+
 .profileWrapper {
   min-height: calc(100vh - 150px);
 }
@@ -8,11 +18,23 @@
   margin-bottom: 44px;
 }
 
+@media screen and (max-width: 639px) {
+  .profileHeader {
+    margin-bottom: 22px;
+  }
+}
+
 .profilePictureWrapper {
   flex: 3;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media screen and (max-width: 639px) {
+  .profilePictureWrapper {
+    align-items: flex-start;
+  }
 }
 
 .profilePicture {
@@ -39,6 +61,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-right: 1rem;
+}
+
+@media screen and (max-width: 639px) {
+  .username {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0;
+    padding-bottom: 10px;
+  }
+
+  .info p {
+    margin-bottom: 10px !important;
+  }
 }
 
 .info {
@@ -66,9 +102,16 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  grid-auto-rows: minmax(300px, auto);
+  margin: 0 1rem;
+  grid-auto-rows: minmax(100%, auto);
   padding-bottom: 3rem;
   padding-top: 1rem;
+}
+
+@media screen and (max-width: 639px) {
+  .profileBody {
+    gap: 0.25rem;
+  }
 }
 
 .profilePost {

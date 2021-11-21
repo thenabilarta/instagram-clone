@@ -1,14 +1,16 @@
 /* eslint-disable array-callback-return */
-import { useState, useEffect, Fragment, useRef } from "react";
-import { Row, Button } from "antd";
+import { useState, useEffect, Fragment, useRef, useLayoutEffect } from "react";
+import { Row, Button, Modal } from "antd";
 import axios from "axios";
 import { MessageOutlined, SendOutlined } from "@ant-design/icons";
 import Navbar from "../../components/Navbar";
+import NavbarMobile from "../../components/NavbarMobile";
 import styles from "./message.module.css";
 import { readCookie } from "../../utils/utils";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
+import { URL } from "../../config/env";
 
 function Message() {
   const [hasMessage, setHasMessage] = useState(false);
@@ -18,8 +20,10 @@ function Message() {
   const [chosedChat, setChosedChat] = useState(null);
   const [chosedChatUsername, setChosedChatUsername] = useState("");
   const [message, setMessage] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [mobileMode, setMobileMode] = useState(false);
 
-  const URL = "http://localhost:5000";
+  const SOCKETURL = URL;
   const socket = useRef(null);
 
   const divRef = useRef(null);
@@ -29,7 +33,7 @@ function Message() {
     if (mounted) {
       fetchUser();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      socket.current = io(URL, { autoConnect: false });
+      socket.current = io(SOCKETURL, { autoConnect: false });
       socket.current.connect();
       socket.current.on("private message", (res) => {
         _setMessageList(res);
@@ -41,6 +45,7 @@ function Message() {
     return () => {
       mounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const auth = useSelector((state) => state.auth);
@@ -108,7 +113,7 @@ function Message() {
 
   const fetchUser = () => {
     axios
-      .get("http://localhost:5000/api/users", {
+      .get(`${URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${readCookie("token")}`,
         },
@@ -118,12 +123,84 @@ function Message() {
       });
   };
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  function useWindowSize() {
+    const [size, setSize] = useState([0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }
+
+  const [width] = useWindowSize();
+
+  useEffect(() => {
+    if (width < 990) {
+      setMobileMode(true);
+    } else {
+      setMobileMode(false);
+    }
+  }, [width]);
+
   return (
     <>
       <Navbar />
+      {width < 640 && <NavbarMobile />}
       <div className="mainWrapper">
-        <div className={styles.messageWrapper}>
-          <div className={styles.leftWrapper}>
+        <Modal
+          visible={isModalVisible}
+          footer={null}
+          onCancel={() => setIsModalVisible(false)}
+        >
+          {userList.map((u) => {
+            if (u.id !== auth.id) {
+              return (
+                <div
+                  className={styles.userListBox}
+                  style={{
+                    cursor: "pointer",
+                    backgroundColor: chosedChat === u.id ? "#efefef" : "#fff",
+                  }}
+                  key={u.id}
+                  onClick={() => {
+                    setChosedChat(u.id);
+                    setHasMessage(true);
+                    setIsModalVisible(false);
+                  }}
+                >
+                  <div className={styles.profilePictureWrapper}>
+                    <img src={u.profilePictureSRC} alt="" />
+                  </div>
+                  <div className={styles.userListChat}>
+                    <p>{u.username}</p>
+                  </div>
+                </div>
+              );
+            }
+          })}
+        </Modal>
+        <div
+          className={styles.messageWrapper}
+          style={{
+            maxWidth: mobileMode ? "350px" : "none",
+            margin: !mobileMode ? "none" : width < 350 ? "0 1rem" : "auto",
+          }}
+        >
+          <div
+            className={styles.leftWrapper}
+            style={{
+              borderRight: mobileMode ? "none" : "1px solid #dbdbdb",
+              display: mobileMode && chosedChat !== null ? "none" : "flex",
+            }}
+          >
             <Row className={styles.leftHeader}>username</Row>
             <Row className={styles.leftTitle}>Messages</Row>
             <div className={styles.userListWrapper}>
@@ -156,7 +233,12 @@ function Message() {
               })}
             </div>
           </div>
-          <div className={styles.rightWrapper}>
+          <div
+            className={styles.rightWrapper}
+            style={{
+              display: mobileMode && chosedChat === null ? "none" : "flex",
+            }}
+          >
             {!hasMessage ? (
               <div className={styles.messageBanner}>
                 <MessageOutlined className={styles.icon} />
@@ -164,7 +246,13 @@ function Message() {
                 <p className={styles.h2}>
                   Send private messages to your friend
                 </p>
-                <Button type="primary" onClick={() => setHasMessage(true)}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    // setHasMessage(true)
+                    showModal();
+                  }}
+                >
                   Send Message
                 </Button>
               </div>
@@ -172,60 +260,70 @@ function Message() {
               <>
                 <Row
                   className={styles.rightHeader}
-                  onClick={() => setHasMessage(false)}
+                  // onClick={() => setHasMessage(false)}
                 >
+                  {mobileMode && (
+                    <Button
+                      onClick={() => {
+                        setChosedChat(null);
+                      }}
+                    >
+                      Back
+                    </Button>
+                  )}
                   {chosedChatUsername}
                 </Row>
                 <div className={styles.chatbox}>
-                  {messageList.map((d, index) => {
-                    if (
-                      d._to === auth.id.toString() &&
-                      d._from === chosedChat.toString()
-                    ) {
-                      return (
-                        <Fragment key={index}>
-                          {d.showDate && (
-                            <div className={styles.date}>
-                              {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format(
-                                "dddd, MMMM Do YYYY"
-                              )}
-                            </div>
-                          )}
+                  {chosedChat !== null &&
+                    messageList.map((d, index) => {
+                      if (
+                        d._to === auth.id.toString() &&
+                        d._from === chosedChat.toString()
+                      ) {
+                        return (
+                          <Fragment key={index}>
+                            {d.showDate && (
+                              <div className={styles.date}>
+                                {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format(
+                                  "dddd, MMMM Do YYYY"
+                                )}
+                              </div>
+                            )}
 
-                          <div className={styles.chat}>
-                            <div className={styles.profileImageWrapper}>
-                              <img
-                                src={getUserProfileImage(parseInt(d._from))}
-                                alt=""
-                                className={styles.profileImage}
-                              />
+                            <div className={styles.chat}>
+                              <div className={styles.profileImageWrapper}>
+                                <img
+                                  src={getUserProfileImage(parseInt(d._from))}
+                                  alt=""
+                                  className={styles.profileImage}
+                                />
+                              </div>
+                              <div className={styles.text}>{d.content}</div>
                             </div>
-                            <div className={styles.text}>{d.content}</div>
-                          </div>
-                        </Fragment>
-                      );
-                    }
+                          </Fragment>
+                        );
+                      }
 
-                    if (
-                      d._from === auth.id.toString() &&
-                      d._to === chosedChat.toString()
-                    ) {
-                      return (
-                        <Fragment key={index}>
-                          {d.showDate && (
-                            <div className={styles.date}>
-                              {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format(
-                                "dddd, MMMM Do YYYY"
-                              )}
+                      if (
+                        d._from === auth.id.toString() &&
+                        d._to === chosedChat.toString()
+                      ) {
+                        return (
+                          <Fragment key={index}>
+                            {d.showDate && (
+                              <div className={styles.date}>
+                                {moment(d.date, "DD-MM-YYYYTHH-mm-ss").format(
+                                  "dddd, MMMM Do YYYY"
+                                )}
+                              </div>
+                            )}
+                            <div className={styles.chatUser}>
+                              <div className={styles.textUser}>{d.content}</div>
                             </div>
-                          )}
-                          <div className={styles.chatUser}>
-                            <div className={styles.textUser}>{d.content}</div>
-                          </div>
-                        </Fragment>
-                      );
-                    }
-                  })}
+                          </Fragment>
+                        );
+                      }
+                    })}
                   <div ref={divRef}></div>
                 </div>
                 <div className={styles.chatInputWrapper}>

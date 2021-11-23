@@ -33,7 +33,7 @@ CREATE TABLE `chats` (
   `_to` varchar(255) NOT NULL,
   `date` varchar(255) NOT NULL,
   `content` varchar(255) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -48,7 +48,7 @@ CREATE TABLE `comments` (
   `text` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `created_at` int(11) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -67,7 +67,7 @@ CREATE TABLE `feeds` (
   `location` varchar(255) NOT NULL,
   `tags_id` int(11) NOT NULL,
   `created_at` int(11) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `feeds`
@@ -88,7 +88,7 @@ CREATE TABLE `likes` (
   `user_id` int(11) NOT NULL,
   `liked_by_user_id` int(11) NOT NULL,
   `date` int(11) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -102,7 +102,7 @@ CREATE TABLE `users` (
   `profilePictureSRC` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`

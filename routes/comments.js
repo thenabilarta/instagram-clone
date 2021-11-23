@@ -29,7 +29,7 @@ router.post("/", auth, (req, res) => {
 
   const date = moment().unix();
 
-  const sqlQuery = `INSERT INTO comments (id, user_id, post_id, text, username, created_at) VALUES ('', '${id}', '${post_id}', '${text}', '${username}', '${date}')`;
+  const sqlQuery = `INSERT INTO comments (id, user_id, post_id, text, username, created_at) VALUES (null, '${id}', '${post_id}', '${text}', '${username}', '${date}')`;
 
   connection.query(sqlQuery, (err, data) => {
     if (err) {

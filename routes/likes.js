@@ -26,7 +26,7 @@ router.post("/", auth, (req, res) => {
           message: "Double like",
         });
       } else {
-        const sqlQuery = `INSERT INTO likes (id, post_id, user_id, liked_by_user_id, date) VALUES ('', '${feed_id}', '${owner}', '${user_id}', '${date}')`;
+        const sqlQuery = `INSERT INTO likes (id, post_id, user_id, liked_by_user_id, date) VALUES (null, '${feed_id}', '${owner}', '${user_id}', '${date}')`;
 
         connection.query(sqlQuery, (err, data) => {
           if (err) {

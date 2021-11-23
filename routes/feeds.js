@@ -73,7 +73,7 @@ router.post("/", auth, upload.single("files"), (req, res) => {
 
   const imageURL = `${process.env.IMAGE_URL}/uploads/` + req.file.filename;
 
-  const sqlQuery = `INSERT INTO feeds (id, user_id, image_url, stored_as, caption, liked, comment_id, location, tags_id, created_at) VALUES ('', '${id}', '${imageURL}', '', '${caption}', '', '', '', '', '${date}')`;
+  const sqlQuery = `INSERT INTO feeds (id, user_id, image_url, stored_as, caption, liked, comment_id, location, tags_id, created_at) VALUES (null, '${id}', '${imageURL}', '', '${caption}', 0, 0, '', 0, '${date}')`;
 
   connection.query(sqlQuery, (err, data) => {
     if (err) {

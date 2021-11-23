@@ -19,7 +19,7 @@ router.post("/register", (req, res) => {
 
     bcrypt.hash(password, salt, function (err, hash) {
       if (err) return next(err);
-      const sqlQuery = `INSERT INTO users (id, username, profilePictureSRC, email, password) VALUES ('', '${username}', 'https://www.gravatar.com/avatar/${moment().unix()}?d=identicon','${email}', '${hash}')`;
+      const sqlQuery = `INSERT INTO users (id, username, profilePictureSRC, email, password) VALUES (null, '${username}', 'https://www.gravatar.com/avatar/${moment().unix()}?d=identicon','${email}', '${hash}')`;
 
       connection.query(sqlQuery, (err, data) => {
         if (err) {

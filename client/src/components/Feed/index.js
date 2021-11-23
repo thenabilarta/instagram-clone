@@ -12,6 +12,7 @@ import axios from "axios";
 import { readCookie } from "../../utils/utils";
 import moment from "moment";
 import { useHistory } from "react-router-dom";
+import { REACTURL } from "../../config/env";
 
 const Feed = ({ feed, fetchFeed, userId }) => {
   const [comment, setComment] = useState("");
@@ -47,7 +48,7 @@ const Feed = ({ feed, fetchFeed, userId }) => {
   const createComment = (post_id) => {
     axios
       .post(
-        "http://localhost:5000/api/comments",
+        `${REACTURL}/api/comments`,
         { text: comment, post_id },
         {
           headers: {
@@ -65,7 +66,7 @@ const Feed = ({ feed, fetchFeed, userId }) => {
   const likeAPost = (feed_id, owner, user_id) => {
     axios
       .post(
-        "http://localhost:5000/api/likes",
+        `${REACTURL}/api/likes`,
         { feed_id, owner, user_id },
         {
           headers: {
@@ -87,7 +88,7 @@ const Feed = ({ feed, fetchFeed, userId }) => {
   const unlikeAPost = (feed_id, user_id) => {
     axios
       .post(
-        "http://localhost:5000/api/likes/unlike",
+        `${REACTURL}/api/likes/unlike`,
         { feed_id, user_id },
         {
           headers: {

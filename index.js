@@ -29,13 +29,13 @@ app.use("/api/likes", require("./routes/likes"));
 
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
-app.use(express.static(path.join(__dirname, "/client/build")));
+// app.use(express.static(path.join(__dirname, "/client/build")));
 
-app.get("*", (req, res) =>
-  res.sendFile(path.join(__dirname, "/client/build/index.html"))
-);
+// app.get("*", (req, res) =>
+//   res.sendFile(path.join(__dirname, "/client/build/index.html"))
+// );
 
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 5000;
 
 httpServer.listen(PORT, () =>
   console.log(`server listening at http://localhost:${PORT}`)
@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
     connection.query(
       `INSERT INTO chats
       (id, _from, _to, date, content) VALUES 
-      ('', '${from}', '${to}', '${date}', '${content}')`
+      (null, '${from}', '${to}', '${date}', '${content}')`
     );
     connection.query("SELECT * FROM chats", (err, res) => {
       io.emit("private message", res);

@@ -67,10 +67,15 @@ router.post("/login", (req, res) => {
               isLoggedIn: true,
               token,
             });
+          } else {
+            res.status(403).send({
+              status: "Error",
+              message: "Username or password not found",
+            });
           }
         });
       } else {
-        res.send({
+        res.status(403).send({
           status: "Error",
           message: "Username or password not found",
         });

@@ -35,7 +35,7 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 //   res.sendFile(path.join(__dirname, "/client/build/index.html"))
 // );
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6000;
 
 httpServer.listen(PORT, () =>
   console.log(`server listening at http://localhost:${PORT}`)

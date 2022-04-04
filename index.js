@@ -29,11 +29,11 @@ app.use("/api/likes", require("./routes/likes"));
 
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
-// app.use(express.static(path.join(__dirname, "/client/build")));
+app.use(express.static(path.join(__dirname, "/client/build")));
 
-// app.get("*", (req, res) =>
-//   res.sendFile(path.join(__dirname, "/client/build/index.html"))
-// );
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "/client/build/index.html"))
+);
 
 const PORT = process.env.PORT || 5000;
 

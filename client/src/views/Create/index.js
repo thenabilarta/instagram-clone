@@ -106,6 +106,7 @@ function Create({ location }) {
             <strong
               onClick={() => post()}
               style={{ color: "#0095f6", cursor: "pointer" }}
+              data-test="input-feed-submit"
             >
               Share
             </strong>
@@ -121,6 +122,7 @@ function Create({ location }) {
                 placeholder="Write a caption..."
                 bordered={false}
                 onChange={(e) => setCaption(e.target.value)}
+                data-test="input-feed-caption"
               />
             </div>
             <div className={styles.postImage}>

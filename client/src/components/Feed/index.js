@@ -13,6 +13,7 @@ import { readCookie } from "../../utils/utils";
 import moment from "moment";
 import { useHistory } from "react-router-dom";
 import { REACTURL } from "../../config/env";
+import { useSelector } from "react-redux";
 
 const Feed = ({ feed, fetchFeed, userId }) => {
   const [comment, setComment] = useState("");
@@ -20,6 +21,10 @@ const Feed = ({ feed, fetchFeed, userId }) => {
   const [activeLike, setActiveLike] = useState(false);
 
   const history = useHistory();
+
+  const state = useSelector((state) => state.auth);
+
+  console.log(state);
 
   const hoursPosted = () => {
     const hour = (moment().unix() - feed.created_at) / 3600;
@@ -234,7 +239,11 @@ const Feed = ({ feed, fetchFeed, userId }) => {
             style={{ padding: 0 }}
             placeholder="Add a comment..."
             bordered={false}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(e) => {
+              if (state.isLoggedIn) {
+                setComment(e.target.value);
+              }
+            }}
             value={comment}
           />
           <strong

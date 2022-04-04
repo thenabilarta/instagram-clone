@@ -20,7 +20,8 @@ function App() {
         <Route exact path="/create" component={Auth(Create, null)} />
         <Route exact path="/profile/:id" component={Auth(OtherProfile, null)} />
         <Route exact path="/profile" component={Auth(Profile, null)} />
-        <Route exact path="/" component={Auth(Dashboard, null)} />
+        {/* <Route exact path="/" component={Auth(Dashboard, null)} /> */}
+        <Route exact path="/" component={Dashboard} />
         <Route exact path="/login" component={Auth(Login, null)} />
         <Route exact path="/register" component={Register} />
       </Switch>

@@ -147,6 +147,7 @@ const Login = () => {
                     size="large"
                     placeholder="Username"
                     style={{ height: 36 }}
+                    data-test="input-username"
                   />
                 </Form.Item>
                 <Form.Item
@@ -159,6 +160,7 @@ const Login = () => {
                     size="large"
                     placeholder="Password"
                     style={{ height: 36 }}
+                    data-test="input-password"
                   />
                 </Form.Item>
                 <Form.Item>
@@ -167,6 +169,7 @@ const Login = () => {
                       type="primary"
                       htmlType="submit"
                       style={{ width: "100%" }}
+                      data-test="button-login-submit"
                     >
                       Submit
                     </Button>

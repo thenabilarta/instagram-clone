@@ -11,7 +11,7 @@ import {
   PlusCircleFilled,
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
-import { Fragment } from "react";
+import { Fragment, useLayoutEffect, useState } from "react";
 
 function Navbar() {
   const history = useHistory();
@@ -22,9 +22,26 @@ function Navbar() {
 
   const state = useSelector((state) => state);
 
+  console.log(state);
+
   // const onChange = (e) => {
   //   console.log(e);
-  // };
+  // }
+
+  function useWindowSize() {
+    const [size, setSize] = useState([0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }
+
+  const [width] = useWindowSize();
 
   return (
     <div className={styles.navbarWrapper}>
@@ -38,72 +55,93 @@ function Navbar() {
               alt=""
             />
           </div>
-          {/* <div className={styles.inputWrapper}>
-            <Input placeholder="Search" allowClear onChange={onChange} />
-          </div> */}
-          <div className={styles.menuWrapper}>
-            {path === "/" ? (
-              <>
-                <HomeFilled className={styles.menuIcon} />
-              </>
-            ) : (
-              <>
-                <HomeOutlined
+          {state.auth.isLoggedIn ? (
+            <div className={styles.menuWrapper}>
+              {path === "/" ? (
+                <>
+                  <HomeFilled className={styles.menuIcon} />
+                </>
+              ) : (
+                <>
+                  <HomeOutlined
+                    className={styles.menuIcon}
+                    onClick={() => {
+                      history.push("/");
+                    }}
+                  />
+                </>
+              )}
+
+              {path === "/message" ? (
+                <MessageFilled className={styles.menuIcon} />
+              ) : (
+                <MessageOutlined
                   className={styles.menuIcon}
                   onClick={() => {
-                    history.push("/");
+                    history.push("/message");
                   }}
                 />
-              </>
-            )}
+              )}
 
-            {path === "/message" ? (
-              <MessageFilled className={styles.menuIcon} />
-            ) : (
-              <MessageOutlined
-                className={styles.menuIcon}
+              {path === "/create" ? (
+                <PlusCircleFilled className={styles.menuIcon} />
+              ) : (
+                <Fragment>
+                  <input
+                    type="file"
+                    style={{ display: "none" }}
+                    name="inputPost"
+                    id="inputPost"
+                    accept="image/jpeg"
+                    data-test="input-feed"
+                    onChange={(e) => {
+                      console.log(e.target.files);
+                      history.push({
+                        pathname: "/create",
+                        state: {
+                          media: e.target.files,
+                        },
+                      });
+                    }}
+                  />
+                  <label htmlFor="inputPost" className={styles.menuIcon}>
+                    <PlusCircleOutlined />
+                  </label>
+                </Fragment>
+              )}
+
+              <HeartOutlined className={styles.menuIcon} />
+              <div
+                className={styles.profilePicture}
                 onClick={() => {
-                  history.push("/message");
+                  history.push("/profile");
                 }}
-              />
-            )}
-
-            {path === "/create" ? (
-              <PlusCircleFilled className={styles.menuIcon} />
-            ) : (
-              <Fragment>
-                <input
-                  type="file"
-                  style={{ display: "none" }}
-                  name="inputPost"
-                  id="inputPost"
-                  accept="image/jpeg"
-                  onChange={(e) => {
-                    console.log(e.target.files);
-                    history.push({
-                      pathname: "/create",
-                      state: {
-                        media: e.target.files,
-                      },
-                    });
-                  }}
-                />
-                <label htmlFor="inputPost" className={styles.menuIcon}>
-                  <PlusCircleOutlined />
-                </label>
-              </Fragment>
-            )}
-
-            <HeartOutlined className={styles.menuIcon} />
-            <div
-              className={styles.profilePicture}
-              onClick={() => {
-                history.push("/profile");
-              }}
-            >
-              <img src={state.auth.profilePic} alt="" />
+              >
+                <img src={state.auth.profilePic} alt="" />
+              </div>
             </div>
-          </div>
+          ) : (
+            <p
+              onClick={() => {
+                history.push("/login");
+              }}
+              style={
+                width > 640
+                  ? {
+                      marginBottom: 0,
+                      cursor: "pointer",
+                    }
+                  : {
+                      marginBottom: 0,
+                      cursor: "pointer",
+                      width: "100%",
+                      textAlign: "center",
+                    }
+              }
+            >
+              Login
+            </p>
+          )}
         </div>
       </div>
     </div>

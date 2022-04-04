@@ -21,16 +21,10 @@ function Dashboard() {
   }, []);
 
   const fetchFeed = () => {
-    axios
-      .get(`${REACTURL}/api/feeds`, {
-        headers: {
-          Authorization: `Bearer ${readCookie("token")}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setFeeds(res.data);
-      });
+    axios.get(`${REACTURL}/api/feeds`).then((res) => {
+      console.log(res.data);
+      setFeeds(res.data);
+    });
   };
 
   const fetchUser = () => {
@@ -72,15 +66,17 @@ function Dashboard() {
             left: 613 + offset + 28,
           }}
         >
-          <div className={styles.rightWrapperHeader}>
-            <div className={styles.rightWrapperHeaderImageWrapper}>
-              <img src={auth.profilePic} alt="" />
+          {auth.isLoggedIn && (
+            <div className={styles.rightWrapperHeader}>
+              <div className={styles.rightWrapperHeaderImageWrapper}>
+                <img src={auth.profilePic} alt="" />
+              </div>
+              <div className={styles.rightWrapperHeaderText}>
+                <p>@{auth.username}</p>
+                <p>{auth.email}</p>
+              </div>
             </div>
-            <div className={styles.rightWrapperHeaderText}>
-              <p>@{auth.username}</p>
-              <p>{auth.email}</p>
-            </div>
-          </div>
+          )}
           <div className={styles.rightWrapperFooter}>
             <p>
               About Help Press API Jobs Privacy Terms Locations Top Accounts
@@ -100,13 +96,15 @@ function Dashboard() {
       <div className="mainWrapper">
         <div className={styles.dashboardWrapper}>
           <div className={styles.leftWrapper}>
-            <div className={styles.storyWrapper}>
-              {userStory.length > 0 &&
-                userStory.map((user) => (
-                  <Story user={user} key={user.username} />
-                ))}
-              <Story />
-            </div>
+            {auth.isLoggedIn && (
+              <div className={styles.storyWrapper}>
+                {userStory.length > 0 &&
+                  userStory.map((user) => (
+                    <Story user={user} key={user.username} />
+                  ))}
+                <Story />
+              </div>
+            )}
             {feeds.length > 0 &&
               feeds.map((feed) => (
                 <Feed

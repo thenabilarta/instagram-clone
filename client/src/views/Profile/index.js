@@ -23,6 +23,8 @@ function Profile() {
   }, []);
 
   const fetchFeed = () => {
+    console.log(REACTURL);
+
     if (state.id) {
       axios
         .get(`${REACTURL}/api/feeds/${state.id}`, {
